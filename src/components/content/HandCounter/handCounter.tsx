@@ -1,36 +1,65 @@
 import { useContext, useEffect, useState } from 'react';
 import {
-  Button
+  Button,
+  Input
 } from 'antd';
 import classNames from 'classnames';
 import { BaseContext } from '../../base/Base';
-import './home.css';
+import './handCounter.css';
 
 export const StartPage = () => {
   const baseContext = useContext(BaseContext);
-  useEffect(() => baseContext.setTitle('Start'));
-  const [state, setState] = useState({colorStatus: true});
+  useEffect(() => baseContext.setTitle('Calculate Hand Score'));
+  const [handScore, setHandScore] = useState<number | null>(null);
 
-  const handleChangeColor = () => {
-    setState({
-      colorStatus: !state.colorStatus,
-    })
+  const handleCalculateScore = () => {
+    const inputString = (document.getElementById("cardInput") as HTMLInputElement).value.trim();
+
+    if (!inputString.includes(":"))
+    {
+      alert("Please enter cards in valid format. Must include a colon to separate hand and cut cards")
+      return;
+    }
+    const handAndCutCards = inputString.split(":");
+    const handCards = handAndCutCards[0];
+    const cutCards = handAndCutCards[1];
+
+    alert(cutCards);
+
+    setHandScore(19);
   };
-
-  const {
-    colorStatus
-  } = state;
 
   return (
     <div>
       <div className="margin-bottom-md">
-        <Button type="primary" onClick={handleChangeColor}>Click here to change text color</Button>
-        <span className={classNames("margin-left-md", {"text-red": !colorStatus})}>This text will change color</span>
+        Type the cards in your hand and the cut card(s) into the box below. <br/>
+        Cards must be input in format of <strong>&#123;rank&#125;&#123;suit&#125;</strong>, with a colon separating the cards in your hand and the cut cards. <br/><br/>
+        For example, if your hand is:
+        <div>
+          <li>Ace of Spades</li>
+          <li>Four of Diamonds</li>
+          <li>Five of Clubs</li>
+          <li>Jack of Hearts</li>
+        </div>
+        and there are two cards that were cut:
+        <div>
+          <li>Eight of Spades</li>
+          <li>Two of Hearts</li>
+        </div>
+        the input would look like: "<strong>AS 4D 5C JH : 8S 2H</strong>"<br/>
       </div>
-
       <div className="margin-bottom-md">
-        use <span className="code-text">setState</span> to modify the state of the current Component
+        <Input id="cardInput" placeholder='Input cards (i.e. 3C 4D 5S JH : 10H)' />
       </div>
+      <div className="margin-bottom-md">
+        <Button type="primary" onClick={handleCalculateScore}>Click to count hand</Button>
+      </div>
+     <br/>
+     {handScore && (
+       <div className="margin-bottom-md">
+        Your total hand score is: <strong>{handScore}</strong>
+      </div>
+      )}
     </div>
   );
 }

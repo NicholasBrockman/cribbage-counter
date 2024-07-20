@@ -4,7 +4,7 @@ import { routeUrls } from "../../routes";
 
 import './sidebar.css'
 import { ItemType, MenuItemType } from "antd/es/menu/interface";
-import { FileOutlined, AimOutlined, HomeOutlined, MinusCircleOutlined } from "@ant-design/icons";
+import { AimOutlined, HomeOutlined } from "@ant-design/icons";
 
 
 export const SideBar = () => {
