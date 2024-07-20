@@ -3,7 +3,7 @@ import {BaseContext} from '../../base/Base';
 
 export const WebpackPage = () => {
   const baseContext = useContext(BaseContext);
-  useEffect(() => baseContext.setTitle('About Vite'));
+  useEffect(() => baseContext.setTitle('Find Best Joker'));
   const code = `
 import { resolve } from 'path'
 import { defineConfig } from 'vite'
