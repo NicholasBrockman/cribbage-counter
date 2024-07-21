@@ -6,6 +6,7 @@ import {
 import classNames from 'classnames';
 import { BaseContext } from '../../base/Base';
 import './handCounter.css';
+import { FullDeckCards } from '../../../types/card';
 
 export const StartPage = () => {
   const baseContext = useContext(BaseContext);
@@ -24,7 +25,8 @@ export const StartPage = () => {
     const handCards = handAndCutCards[0];
     const cutCards = handAndCutCards[1];
 
-    alert(cutCards);
+    const deckOfCards = FullDeckCards;
+    alert(deckOfCards);
 
     setHandScore(19);
   };
