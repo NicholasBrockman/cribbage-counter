@@ -129,17 +129,3 @@ export enum CardRank {
 export const FullDeckCards = Object.values(CardSuit).filter((suit) => typeof suit !== "string").flatMap(s =>
     Object.values(CardRank).filter((rank) => typeof rank !== "string").map((r) => {return new Card(r, s) })
 );
-
-// export var FullDeckCards = () => {
-//     var suits = Object.values(CardSuit).filter((suit) => typeof suit !== "string");
-//     var ranks = Object.values(CardRank).filter((rank) => typeof rank !== "string");
-//     return suits.flatMap(s => ranks.map((v) => { return new Card(v, s) }));
-// }
-// Object.values(CardSuit).filter((suit) => typeof suit !== "string").forEach((cardSuit) => {
-//         Object.values(CardRank).filter((rank) => typeof rank !== "string").map((cardRank) => {
-//             return new Card(cardRank, cardSuit)
-//         })
-//         let fullDeck = suits.map(s => values.map(v => s + v));
-//         return deckNew;
-//     });
-    // return cards;
