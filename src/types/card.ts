@@ -3,11 +3,13 @@ export class Card {
         this.rank = rank;
         this.suit = suit;
         this.value = getCardValue(rank);
+        this.displayName = getDisplayName(rank, suit);
     }
 
     rank: CardRank;
     suit: CardSuit;
     value: number;
+    displayName: string;
 }
 
 const getCardValue = (rank: CardRank) =>  {
@@ -36,13 +38,74 @@ const getCardValue = (rank: CardRank) =>  {
         case CardRank.King:
             return 10;
     }
+}
 
+const getDisplayName = (rank: CardRank, suit: CardSuit) =>  {
+    let suitIcon = "";
+    switch (suit) {
+        case CardSuit.Spades:
+            suitIcon = '\u2660'
+            break;
+        case CardSuit.Hearts:
+            suitIcon = '\u2665'
+            break;
+            case CardSuit.Diamonds:
+            suitIcon = '\u2666'
+            break;
+            case CardSuit.Clubs:
+            suitIcon = "\u2663"
+            break;
+    }
+    let rankDisplay = "";
+    switch (rank) {
+        case CardRank.Ace:
+            rankDisplay = "A";
+            break;
+        case CardRank.Two:
+            rankDisplay = "2";
+            break;
+        case CardRank.Three:
+            rankDisplay = "3";
+            break;
+        case CardRank.Four:
+            rankDisplay = "4";
+            break;
+        case CardRank.Five:
+            rankDisplay = "5";
+            break;
+        case CardRank.Six:
+            rankDisplay = "6";
+            break;
+        case CardRank.Seven:
+            rankDisplay = "7";
+            break;
+        case CardRank.Eight:
+            rankDisplay = "8";
+            break;
+        case CardRank.Nine:
+            rankDisplay = "9";
+            break;
+        case CardRank.Ten:
+            rankDisplay = "10";
+            break;
+        case CardRank.Jack:
+            rankDisplay = "J";
+            break;
+        case CardRank.Queen:
+            rankDisplay = "Q";
+            break;
+        case CardRank.King:
+            rankDisplay = "K";
+            break;
+    }
+
+    return rankDisplay + suitIcon;
 }
 
 export enum CardSuit {
+    Spades,
     Hearts,
     Diamonds,
-    Spades,
     Clubs
 }
 

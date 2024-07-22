@@ -2,6 +2,17 @@
   height: 700px;
 }
 
-li {
-  font-weight: bold;
+.cardDisplay
+{
+    border: solid 1px #aaa;
+    border-radius: 9px;
+    padding: 5px;
+    width: 30px;
+    height: 30px;
+    margin: 5px;
+    cursor: pointer;
+
+    &.cardRed {
+      color: red;
+    }
 }
