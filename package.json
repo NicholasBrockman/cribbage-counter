@@ -1,16 +1,16 @@
 {
-  "name": "react-antd-boilerplate",
+  "name": "cribbage-counter",
   "version": "0.1.0",
   "private": false,
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build --base=/react-antd-boilerplate/",
+    "build": "tsc && vite build --base=/cribbageCounter/",
     "clean": "rimraf dist",
     "preview": "vite preview"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/arknodel/react-antd-boilerplate.git"
+    "url": "https://https://github.com/NicholasBrockman/cribbageCounter.git"
   },
   "license": "MIT",
   "devDependencies": {
