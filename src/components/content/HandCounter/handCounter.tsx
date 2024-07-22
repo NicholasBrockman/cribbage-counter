@@ -2,7 +2,6 @@ import { useContext, useEffect, useState } from 'react';
 import {
   Button,
   Col,
-  Input,
   Radio,
   RadioChangeEvent,
   Row
@@ -11,6 +10,7 @@ import classNames from 'classnames';
 import { BaseContext } from '../../base/Base';
 import './handCounter.css';
 import { Card, CardSuit, FullDeckCards } from '../../../types/card';
+import { sum } from 'lodash';
 
 export const StartPage = () => {
   const baseContext = useContext(BaseContext);
@@ -25,7 +25,8 @@ export const StartPage = () => {
   }
 
   const handleCardClick = (selectedCard: Card) => {
-    if (isAddingToHand){
+    if (isAddingToHand)
+    {
       setHandCards([...handCards, selectedCard]);
     }
     else 
@@ -35,7 +36,8 @@ export const StartPage = () => {
   }
 
   const handleClearSelection = () => {
-    if (isAddingToHand){
+    if (isAddingToHand)
+    {
       setHandCards([]);
     }
     else 
@@ -44,21 +46,58 @@ export const StartPage = () => {
     }
   }
 
+  const sumFifteen = (cardValues: number[], subSetValues: number[], runningTotal: { total: number }) => {
+    const currentTotal = sum(subSetValues);
+    if (currentTotal === 15) 
+    {
+      runningTotal.total += 2;
+    }
+
+    if (currentTotal >= 15 || cardValues.length === 0)
+    {
+      return;
+    }
+
+    for (let i = 0; i < cardValues.length; i++){
+      const currentValue = cardValues[i];
+      const remaining = cardValues.slice(i+1);
+      sumFifteen(remaining, subSetValues.concat([currentValue]), runningTotal);
+    }
+  }
+
+  const sumRuns = (sortedCardValues: number[], runningTotal: { total: number }) => {
+    return 0;
+  }
+
+  const sumMiscPoints = (runningTotal: { total: number }) => {
+    return 0;
+  }
+
   const handleCalculateScore = () => {
     if (handCards.length === 0 || cutCards.length === 0)
     {
       alert("Please select at least one card for both hand and cut.")
       return;
     }
-    const deckOfCards = FullDeckCards;
-    alert(deckOfCards);
 
-    setHandScore(19);
+    // sort cards from lowest to highest
+    const sortedCardValues = [...handCards, ...cutCards].map(card => card.value).sort((a, b) => a - b);
+
+    // passing in object instead of number to update by reference
+    let runningTotal = { total: 0 };
+    sumFifteen(sortedCardValues, [], runningTotal);
+
+    // TODO: runs and misc
+    sumRuns(sortedCardValues, runningTotal);
+    sumMiscPoints(runningTotal);
+
+    setHandScore(runningTotal.total);
   };
 
   const cardsBySuit = new Map<CardSuit, Card[]>();
   FullDeckCards.forEach((card) => {
-    if (!cardsBySuit.has(card.suit)) {
+    if (!cardsBySuit.has(card.suit))
+    {
       cardsBySuit.set(card.suit, []);
     }
     cardsBySuit.set(card.suit, [...cardsBySuit.get(card.suit), card]);
@@ -133,7 +172,7 @@ export const StartPage = () => {
           
         </Col>
       <br/>
-      {handScore && (
+      {handScore !== null && (
         <div className="margin-bottom-md">
           Your total hand score is: <strong>{handScore}</strong>
         </div>
