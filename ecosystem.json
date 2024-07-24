@@ -1,6 +1,6 @@
 {
   "apps": [{
-    "name": "cribbageCounter",
+    "name": "cribbage-counter",
     "script": "index.js",
     "log_date_format": "YYYY-MM-DD HH:mm:ss"
   }],
@@ -9,16 +9,16 @@
       "user" : "deploy",
       "host" : "https://github.com",
       "ref"  : "origin/main",
-      "repo" : "git@github.com:NicholasBrockman/cribbageCounter.git",
-      "path" : "~/cribbageCounter",
+      "repo" : "git@github.com:NicholasBrockman/cribbage-counter.git",
+      "path" : "~/cribbage-counter",
       "post-deploy" : "npm i && npm run build"
     },
     "production" : {
       "user" : "deploy",
       "host" : "https://github.com",
       "ref"  : "origin/main",
-      "repo" : "git@github.com:NicholasBrockman/cribbageCounter.git",
-      "path" : "~/cribbageCounter",
+      "repo" : "git@github.com:NicholasBrockman/cribbage-counter.git",
+      "path" : "~/cribbage-counter",
       "post-deploy" : "npm i && npm run build"
     }
   }
