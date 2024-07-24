@@ -66,10 +66,14 @@ export const StartPage = () => {
   }
 
   const sumRuns = (sortedCardValues: number[], runningTotal: { total: number }) => {
+    console.log(sortedCardValues);
+    console.log(runningTotal.total);
+
     return 0;
   }
 
   const sumMiscPoints = (runningTotal: { total: number }) => {
+    console.log(runningTotal.total);
     return 0;
   }
 

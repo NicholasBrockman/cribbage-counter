@@ -4,13 +4,13 @@
   "private": false,
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build --base=/cribbageCounter/",
+    "build": "tsc && vite build --base=/cribbage-counter/",
     "clean": "rimraf dist",
     "preview": "vite preview"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/NicholasBrockman/cribbageCounter.git"
+    "url": "https://github.com/NicholasBrockman/cribbage-counter.git"
   },
   "license": "MIT",
   "devDependencies": {
