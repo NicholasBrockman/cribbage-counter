@@ -65,9 +65,35 @@ export const StartPage = () => {
     }
   }
 
-  const sumRuns = (sortedCards: Card[], runningTotal: { total: number }) => {
-    console.log(sortedCards);
-    console.log(runningTotal.total);
+  const sumRuns = (remainingCards: Card[], currentRun: Card[], currentCard: Card, runningTotal: { total: number }) => {
+    if (remainingCards.length === 0)
+    {
+      if (currentRun.length >= 3)
+      {
+        runningTotal.total += currentRun.length;
+      }
+      return;
+    }
+
+    for (let i = 0; i < remainingCards.length; i++){
+      const currentCard = remainingCards[i];
+      const remaining = remainingCards.slice(i+1);
+      // next card not part of run. move on to next card
+      if (currentRun.length !== 0 && currentRun[currentRun.length - 1].rank !== (currentCard.rank - 1)){
+        return;
+      }
+      currentRun = currentRun.concat([currentCard]);
+      // if (remaining.length === 0 || remaining[0].rank !== (currentCard.rank + 1)) 
+      //   {
+      //     if (currentRun.length >= 3)
+      //       {
+      //         runningTotal.total += currentRun.length;
+      //       }
+            
+      //       return;
+      //     }
+      sumRuns(remaining, currentRun, currentCard, runningTotal);
+    }
   }
 
   const sumMiscPoints = (sortedCards: Card[], runningTotal: { total: number }) => {
@@ -123,8 +149,7 @@ export const StartPage = () => {
     let runningTotal = { total: 0 };
     sumFifteen(sortedCards.map(card => card.value), [], runningTotal);
 
-    // TODO: runs
-    sumRuns(sortedCards, runningTotal);
+    sumRuns(sortedCards, [], sortedCards[0], runningTotal);
 
     sumMiscPoints(sortedCards, runningTotal);
 
