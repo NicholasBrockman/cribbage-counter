@@ -53,7 +53,7 @@ export const StartPage = () => {
       runningTotal.total += 2;
     }
 
-    if (currentTotal > 15 || cardValues.length === 0)
+    if (currentTotal >= 15 || cardValues.length === 0)
     {
       return;
     }
@@ -65,8 +65,18 @@ export const StartPage = () => {
     }
   }
 
-  const sumRuns = (remainingCards: Card[], currentRun: Card[], currentCard: Card, runningTotal: { total: number }) => {
-    if (remainingCards.length === 0)
+  const sumRuns = (remainingCards: Card[], currentRun: Card[], runningTotal: { total: number }) => {
+    
+    // else
+    // {
+    //   currentRun = currentRun.concat([currentCard]);
+    // }
+
+    // if (currentRun.length === 0 || (currentCard.rank === currentRun[currentRun.length - 1].rank + 1)) {
+    //   currentRun = currentRun.concat([currentCard]);
+    // }
+    //  no remaining cards, or next card not part of run. move on to next card
+    if (remainingCards.length === 0 || (currentRun.length !== 0 && remainingCards[0].rank !== (currentRun[currentRun.length - 1].rank + 1)))
     {
       if (currentRun.length >= 3)
       {
@@ -75,13 +85,17 @@ export const StartPage = () => {
       return;
     }
 
+
     for (let i = 0; i < remainingCards.length; i++){
       const currentCard = remainingCards[i];
       const remaining = remainingCards.slice(i+1);
-      // next card not part of run. move on to next card
-      if (currentRun.length !== 0 && currentRun[currentRun.length - 1].rank !== (currentCard.rank - 1)){
-        return;
-      }
+      // if (currentRun.length === 0 || (currentCard.rank === currentRun[currentRun.length - 1].rank + 1)) {
+      //   currentRun = currentRun.concat([currentCard]);
+      // }
+      // // next card not part of run. move on to next card
+      // if (currentRun.length !== 0 && currentRun[currentRun.length - 1].rank !== (currentCard.rank - 1)){
+      //   return;
+      // }
       currentRun = currentRun.concat([currentCard]);
       // if (remaining.length === 0 || remaining[0].rank !== (currentCard.rank + 1)) 
       //   {
@@ -92,7 +106,7 @@ export const StartPage = () => {
             
       //       return;
       //     }
-      sumRuns(remaining, currentRun, currentCard, runningTotal);
+      sumRuns(remaining, currentRun, runningTotal);
     }
   }
 
@@ -149,7 +163,7 @@ export const StartPage = () => {
     let runningTotal = { total: 0 };
     sumFifteen(sortedCards.map(card => card.value), [], runningTotal);
 
-    sumRuns(sortedCards, [], sortedCards[0], runningTotal);
+    sumRuns(sortedCards, [], runningTotal);
 
     sumMiscPoints(sortedCards, runningTotal);
 
