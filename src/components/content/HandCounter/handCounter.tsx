@@ -65,48 +65,96 @@ export const StartPage = () => {
     }
   }
 
-  const sumRuns = (remainingCards: Card[], currentRun: Card[], runningTotal: { total: number }) => {
-    
-    // else
-    // {
-    //   currentRun = currentRun.concat([currentCard]);
-    // }
+  const sumRuns = (remainingCards: Card[], runningTotal: { total: number }) => {
 
-    // if (currentRun.length === 0 || (currentCard.rank === currentRun[currentRun.length - 1].rank + 1)) {
-    //   currentRun = currentRun.concat([currentCard]);
-    // }
-    //  no remaining cards, or next card not part of run. move on to next card
-    if (remainingCards.length === 0 || (currentRun.length !== 0 && remainingCards[0].rank !== (currentRun[currentRun.length - 1].rank + 1)))
+    const groupedCards: Map<CardRank, Card[]> = remainingCards.reduce(function(group, card) {
+      (group[card.rank] = group[card.rank] || []).push(card);
+      return group;
+    }, {} as Map<CardRank, Card[]>);
+
+    const numberOfRanks = Object.keys(groupedCards).length;
+    // this is ugliest code I've ever written, but i gave up on recursion
+    for (let i = 0; i < numberOfRanks; i++)
     {
-      if (currentRun.length >= 3)
+      let runMultiplier = groupedCards[i].length;
+      let currentRank = parseInt(Object.keys(groupedCards)[i]) as CardRank;
+      if (groupedCards[currentRank + 1])
       {
-        runningTotal.total += currentRun.length;
+        i++;
+        let cardsInRank = groupedCards[i].length;
+        runMultiplier = runMultiplier * cardsInRank;
+        currentRank = parseInt(Object.keys(groupedCards)[i]) as CardRank;
+        if (groupedCards[currentRank + 1])
+        {
+          // at this point, we are three ranks deep so the run will score points
+          i++;
+          cardsInRank = groupedCards[i].length;
+          runMultiplier = runMultiplier * cardsInRank;
+          currentRank = parseInt(Object.keys(groupedCards)[i]) as CardRank;
+          if (groupedCards[currentRank + 1])
+          {
+            i++;
+            cardsInRank = groupedCards[i].length;
+            runMultiplier = runMultiplier * cardsInRank;
+            currentRank = parseInt(Object.keys(groupedCards)[i]) as CardRank;
+            if (groupedCards[currentRank + 1])
+            {
+              i++;
+              cardsInRank = groupedCards[i].length;
+              runMultiplier = runMultiplier * cardsInRank;
+              currentRank = parseInt(Object.keys(groupedCards)[i]) as CardRank;
+              if (groupedCards[currentRank + 1])
+              {
+                i++;
+                cardsInRank = groupedCards[i].length;
+                runMultiplier = runMultiplier * cardsInRank;
+                currentRank = parseInt(Object.keys(groupedCards)[i]) as CardRank;
+                if (groupedCards[currentRank + 1])
+                {
+                  i++;
+                  cardsInRank = groupedCards[i].length;
+                  runMultiplier = runMultiplier * cardsInRank;
+                  currentRank = parseInt(Object.keys(groupedCards)[i]) as CardRank;
+                  if (groupedCards[currentRank + 1])
+                  {
+                    i++;
+                    cardsInRank = groupedCards[i].length;
+                    runMultiplier = runMultiplier * cardsInRank;
+                    runningTotal.total += runMultiplier * 8;
+                    // i got tired of copying and pasting, only going up to runs of 8
+                  } 
+                  else {
+                    runningTotal.total += runMultiplier * 7;
+                    i++;
+                  }
+                } 
+                else {
+                  runningTotal.total += runMultiplier * 6;
+                  i++;
+                }
+              } 
+              else {
+                runningTotal.total += runMultiplier * 5;
+                i++;
+              }
+            } 
+            else {
+              runningTotal.total += runMultiplier * 4;
+              i++;
+            }
+          }
+          else {
+            runningTotal.total += runMultiplier * 3;
+            i++;
+          }
+        }
+        else {
+          i++;
+        }
       }
-      return;
-    }
-
-
-    for (let i = 0; i < remainingCards.length; i++){
-      const currentCard = remainingCards[i];
-      const remaining = remainingCards.slice(i+1);
-      // if (currentRun.length === 0 || (currentCard.rank === currentRun[currentRun.length - 1].rank + 1)) {
-      //   currentRun = currentRun.concat([currentCard]);
-      // }
-      // // next card not part of run. move on to next card
-      // if (currentRun.length !== 0 && currentRun[currentRun.length - 1].rank !== (currentCard.rank - 1)){
-      //   return;
-      // }
-      currentRun = currentRun.concat([currentCard]);
-      // if (remaining.length === 0 || remaining[0].rank !== (currentCard.rank + 1)) 
-      //   {
-      //     if (currentRun.length >= 3)
-      //       {
-      //         runningTotal.total += currentRun.length;
-      //       }
-            
-      //       return;
-      //     }
-      sumRuns(remaining, currentRun, runningTotal);
+      else {
+        i++;
+      }
     }
   }
 
@@ -162,11 +210,9 @@ export const StartPage = () => {
     // passing in object instead of number to update by reference
     let runningTotal = { total: 0 };
     sumFifteen(sortedCards.map(card => card.value), [], runningTotal);
-
-    sumRuns(sortedCards, [], runningTotal);
-
+    sumRuns(sortedCards, runningTotal);
     sumMiscPoints(sortedCards, runningTotal);
-
+    
     setHandScore(runningTotal.total);
   };
 
