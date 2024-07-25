@@ -9,7 +9,7 @@ import {
 import classNames from 'classnames';
 import { BaseContext } from '../../base/Base';
 import './handCounter.css';
-import { Card, CardSuit, FullDeckCards } from '../../../types/card';
+import { Card, CardRank, CardSuit, FullDeckCards } from '../../../types/card';
 import { sum } from 'lodash';
 
 export const StartPage = () => {
@@ -53,7 +53,7 @@ export const StartPage = () => {
       runningTotal.total += 2;
     }
 
-    if (currentTotal >= 15 || cardValues.length === 0)
+    if (currentTotal > 15 || cardValues.length === 0)
     {
       return;
     }
@@ -65,16 +65,44 @@ export const StartPage = () => {
     }
   }
 
-  const sumRuns = (sortedCardValues: number[], runningTotal: { total: number }) => {
-    console.log(sortedCardValues);
+  const sumRuns = (sortedCards: Card[], runningTotal: { total: number }) => {
+    console.log(sortedCards);
     console.log(runningTotal.total);
-
-    return 0;
   }
 
-  const sumMiscPoints = (runningTotal: { total: number }) => {
-    console.log(runningTotal.total);
-    return 0;
+  const sumMiscPoints = (sortedCards: Card[], runningTotal: { total: number }) => {
+    // calculate the pairs
+    const groupedCards = sortedCards.reduce(function(group, card) {
+      (group[card.rank] = group[card.rank] || []).push(card);
+      return group;
+    }, {} as Map<CardRank, Card[]>);
+
+    Object.keys(groupedCards).forEach((rank) => {
+      if (groupedCards[rank].length > 1){
+        runningTotal.total += (groupedCards[rank].length * (groupedCards[rank].length - 1));
+      }
+    })
+
+    // calculate the flushes
+    if (handCards.every((card) => card.suit === handCards[0].suit))
+    {
+      // add value of flush from hand
+      runningTotal.total += handCards.length;
+
+      // check if cut cards are also part of flush
+      if (cutCards.every((cutCard) => cutCard.suit === handCards[0].suit))
+      {
+        runningTotal.total += cutCards.length;
+      }
+    }
+
+    // calculated nobs
+    const jacksInHand = handCards.filter((card) => card.rank === CardRank.Jack);
+    cutCards.forEach((cutCard) => {
+      if (jacksInHand.map((jack) => jack.suit).includes(cutCard.suit)){
+        runningTotal.total += 1;
+      }
+    })
   }
 
   const handleCalculateScore = () => {
@@ -85,15 +113,16 @@ export const StartPage = () => {
     }
 
     // sort cards from lowest to highest
-    const sortedCardValues = [...handCards, ...cutCards].map(card => card.value).sort((a, b) => a - b);
+    const sortedCards = [...handCards, ...cutCards].sort((a, b) => a.value - b.value);
 
     // passing in object instead of number to update by reference
     let runningTotal = { total: 0 };
-    sumFifteen(sortedCardValues, [], runningTotal);
+    sumFifteen(sortedCards.map(card => card.value), [], runningTotal);
 
-    // TODO: runs and misc
-    sumRuns(sortedCardValues, runningTotal);
-    sumMiscPoints(runningTotal);
+    // TODO: runs
+    sumRuns(sortedCards, runningTotal);
+
+    sumMiscPoints(sortedCards, runningTotal);
 
     setHandScore(runningTotal.total);
   };
@@ -113,7 +142,7 @@ export const StartPage = () => {
          First select where you are adding your cards too (hand or cut cards), and then click on a card to add it that location.
       </div>
       <Row gutter={24}>
-        <Col xs={2} sm={4} md={6}>
+        <Col xs={16} sm={14} md={12} lg={10} xl={8}>
           <Row className="margin-bottom-md">
             <Col>
               <Radio.Group 
@@ -137,15 +166,15 @@ export const StartPage = () => {
             {[...cardsBySuit.entries()].map(([suit, cards]) => (
               <Col>
                 {cards.map((card) => (
-                  <Row className={classNames("cardDisplay", {"cardRed": [CardSuit.Diamonds, CardSuit.Hearts].includes(suit)})}>
-                    <span onClick={() => handleCardClick(card)}>{card.displayName}</span>
+                  <Row onClick={() => handleCardClick(card)} className={classNames("cardDisplay", "fullDeck", {"cardRed": [CardSuit.Diamonds, CardSuit.Hearts].includes(suit)})}>
+                    {card.displayName}
                   </Row>
                 ))}
               </Col>
             ))}
           </Row>
         </Col>
-        <Col span={8}>
+        <Col xs={8} sm={10} md={12} lg={14} xl={16}>
           <div className="margin-bottom-md">
             <Button type="primary" onClick={handleCalculateScore}>Calculate score</Button>
           </div>
@@ -155,11 +184,9 @@ export const StartPage = () => {
             </Col>
           </Row>
           <Row className="margin-bottom-md">
-            <Col xs={8}>
-              {handCards.map((handCard) => (
-                <span className={classNames("cardDisplay", {"cardRed": [CardSuit.Diamonds, CardSuit.Hearts].includes(handCard.suit)})}>{handCard.displayName}</span>
-              ))}
-            </Col>
+            {handCards.map((handCard) => (
+              <span className={classNames("cardDisplay", {"cardRed": [CardSuit.Diamonds, CardSuit.Hearts].includes(handCard.suit)})}>{handCard.displayName}</span>
+            ))}
           </Row>
           <Row className="margin-bottom-md margin-top-md">
             <Col xs={8}>
@@ -167,20 +194,17 @@ export const StartPage = () => {
             </Col>
           </Row>
           <Row>
-            <Col xs={8}>
-              {cutCards.map((cutCard) => (
-                <span className={classNames("cardDisplay", {"cardRed": [CardSuit.Diamonds, CardSuit.Hearts].includes(cutCard.suit)})}>{cutCard.displayName}</span>
-              ))}
-            </Col>
+            {cutCards.map((cutCard) => (
+              <span className={classNames("cardDisplay", {"cardRed": [CardSuit.Diamonds, CardSuit.Hearts].includes(cutCard.suit)})}>{cutCard.displayName}</span>
+            ))}
           </Row>
-          
+          {handScore !== null && (
+            <Row>
+                Your total hand score is:&ensp;<strong>{handScore}</strong>
+            </Row>
+          )}
         </Col>
       <br/>
-      {handScore !== null && (
-        <div className="margin-bottom-md">
-          Your total hand score is: <strong>{handScore}</strong>
-        </div>
-        )}
       </Row>
     </div>
   );

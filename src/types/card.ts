@@ -99,7 +99,7 @@ const getDisplayName = (rank: CardRank, suit: CardSuit) =>  {
             break;
     }
 
-    return rankDisplay + suitIcon;
+    return `${rankDisplay}${suitIcon}`;
 }
 
 export enum CardSuit {
