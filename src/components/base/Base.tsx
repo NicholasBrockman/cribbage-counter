@@ -41,7 +41,7 @@ export const Base = ({
   return (
     <BaseContext.Provider value={{setTitle: setBaseTitle, title: baseTitle}}>
       <Layout hasSider>
-        <Layout.Sider theme='light'>
+        <Layout.Sider theme='light' collapsed={navBarCollapsed} onCollapse={setNavBarCollapsed} onBreakpoint={setNavBarCollapsed} breakpoint='md'>
           <SideBar />
         </Layout.Sider>
         <Layout>
