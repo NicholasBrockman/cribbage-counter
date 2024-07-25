@@ -90,18 +90,22 @@ export const StartPage = () => {
       runningTotal.total += handCards.length;
 
       // check if cut cards are also part of flush
-      if (cutCards.every((cutCard) => cutCard.suit === handCards[0].suit))
-      {
-        runningTotal.total += cutCards.length;
-      }
+      cutCards.forEach((cutCard) => {
+        if (cutCard.suit === handCards[0].suit)
+        {
+          runningTotal.total += 1;
+        }
+      })
     }
 
     // calculated nobs
     const jacksInHand = handCards.filter((card) => card.rank === CardRank.Jack);
     cutCards.forEach((cutCard) => {
-      if (jacksInHand.map((jack) => jack.suit).includes(cutCard.suit)){
-        runningTotal.total += 1;
-      }
+      jacksInHand.forEach((handJack) => {
+        if (handJack.suit === cutCard.suit){
+          runningTotal.total += 1;
+        }
+      })
     })
   }
 
