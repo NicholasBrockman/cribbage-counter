@@ -234,7 +234,7 @@ export const StartPage = () => {
               </Radio.Group>
             </Col>
             <Col className='margin-left-md'>
-              <Button onClick={handleClearSelection}>Clear selection</Button>
+              <Button onClick={handleClearSelection}>Reset</Button>
             </Col>
           </Row>
           <Row className="margin-bottom-md">
