@@ -8,13 +8,13 @@ import {
 } from 'antd';
 import classNames from 'classnames';
 import { BaseContext } from '../../base/Base';
-import './handCounter.css';
+import './simpleCounter.css';
 import { Card, CardRank, CardSuit, FullDeckCards } from '../../../types/card';
 import { sum } from 'lodash';
 
 export const StartPage = () => {
   const baseContext = useContext(BaseContext);
-  useEffect(() => baseContext.setTitle('Calculate Hand Score'));
+  useEffect(() => baseContext.setTitle('Count Hand'));
   const [isAddingToHand, setIsAddingToHand] = useState(true);
   const [handCards, setHandCards] = useState<Card[]>([]);
   const [cutCards, setCutCards] = useState<Card[]>([]);

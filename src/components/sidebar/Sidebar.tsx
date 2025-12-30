@@ -12,15 +12,21 @@ export const SideBar = () => {
   const navigate = useNavigate();
   const items: ItemType<MenuItemType>[] = [
     {
-      key: routeUrls.home,
-      label: "Count Hand",
-      onClick: () => navigate(routeUrls.home),
+      key: routeUrls.simpleCount,
+      label: "Simple Count",
+      onClick: () => navigate(routeUrls.simpleCount),
       icon: <HomeOutlined />,
     },
     {
-      key: routeUrls.vite,
+      key: routeUrls.advCount,
+      label: "Count Hand",
+      onClick: () => navigate(routeUrls.advCount),
+      icon: <HomeOutlined />,
+    },
+    {
+      key: routeUrls.bestJoker,
       label: "Find Best Joker",
-      onClick: () => navigate(routeUrls.vite),
+      onClick: () => navigate(routeUrls.bestJoker),
       icon: <AimOutlined />,
     }
   ]
