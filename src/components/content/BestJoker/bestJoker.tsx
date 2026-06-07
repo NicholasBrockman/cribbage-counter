@@ -1,7 +1,7 @@
 import { useContext, useEffect } from 'react';
 import {BaseContext} from '../../base/Base';
 
-export const WebpackPage = () => {
+export const BestJokerPage = () => {
   const baseContext = useContext(BaseContext);
   useEffect(() => baseContext.setTitle('Find Best Joker'));
 
@@ -12,4 +12,4 @@ export const WebpackPage = () => {
   );
 }
 
-export default WebpackPage;
+export default BestJokerPage;

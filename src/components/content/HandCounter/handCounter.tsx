@@ -12,12 +12,12 @@ import './handCounter.css';
 import { Card, CardRank, CardSuit, FullDeckCards } from '../../../types/card';
 import { sum } from 'lodash';
 
-export const StartPage = () => {
+export const HandCounter = () => {
   const baseContext = useContext(BaseContext);
   useEffect(() => baseContext.setTitle('Calculate Hand Score'));
   const [isAddingToHand, setIsAddingToHand] = useState(true);
-  const [handCards, setHandCards] = useState<Card[] | null>([]);
-  const [cutCards, setCutCards] = useState<Card[] |  null>([]);
+  const [handCards, setHandCards] = useState<Card[]>([]);
+  const [cutCards, setCutCards] = useState<Card[]>([]);
   const [handScore, setHandScore] = useState<{ fifteens: number, runs: number, pairs: number, flushes: number, nobs: number, totalScore: number } | null>(null);
 
   const handleCardLocationChange = (e: RadioChangeEvent) => {
@@ -68,57 +68,61 @@ export const StartPage = () => {
   const sumRuns = (remainingCards: Card[], runningTotal: { runs: number }) => {
 
     const groupedCards: Map<CardRank, Card[]> = remainingCards.reduce(function(group, card) {
-      (group[card.rank] = group[card.rank] || []).push(card);
+      if (!group.has(card.rank)) {
+        group.set(card.rank, []);
+      }
+      group.get(card.rank)!.push(card);
       return group;
-    }, {} as Map<CardRank, Card[]>);
+    }, new Map<CardRank, Card[]>());
 
-    const numberOfRanks = Object.keys(groupedCards).length;
+    const numberOfRanks = groupedCards.size;
     // this is ugliest code I've ever written, but i gave up on recursion
     for (let i = 0; i < numberOfRanks; i++)
     {
-      let runMultiplier = groupedCards[Object.keys(groupedCards)[i]].length;
-      let currentRank = parseInt(Object.keys(groupedCards)[i]) as CardRank;
-      if (groupedCards[currentRank + 1])
+      const keys = Array.from(groupedCards.keys());
+      let runMultiplier = groupedCards.get(keys[i])?.length || 0;
+      let currentRank = parseInt(String(keys[i])) as CardRank;
+      if (groupedCards.get(currentRank + 1))
       {
         i++;
-        let cardsInRank = groupedCards[Object.keys(groupedCards)[i]].length;
+        let cardsInRank = groupedCards.get(keys[i])?.length ?? 0;
         runMultiplier = runMultiplier * cardsInRank;
-        currentRank = parseInt(Object.keys(groupedCards)[i]) as CardRank;
-        if (groupedCards[currentRank + 1])
+        currentRank = parseInt(String(keys[i])) as CardRank;
+        if (groupedCards.get(currentRank + 1))
         {
           // at this point, we are three ranks deep so the run will score points
           i++;
-          cardsInRank = groupedCards[Object.keys(groupedCards)[i]].length;
+          cardsInRank = groupedCards.get(keys[i])?.length ?? 0;
           runMultiplier = runMultiplier * cardsInRank;
-          currentRank = parseInt(Object.keys(groupedCards)[i]) as CardRank;
-          if (groupedCards[currentRank + 1])
+          currentRank = parseInt(String(keys[i])) as CardRank;
+          if (groupedCards.get(currentRank + 1))
           {
             i++;
-            cardsInRank = groupedCards[Object.keys(groupedCards)[i]].length;
+            cardsInRank = groupedCards.get(keys[i])?.length ?? 0;
             runMultiplier = runMultiplier * cardsInRank;
-            currentRank = parseInt(Object.keys(groupedCards)[i]) as CardRank;
-            if (groupedCards[currentRank + 1])
+            currentRank = parseInt(String(keys[i])) as CardRank;
+            if (groupedCards.get(currentRank + 1))
             {
               i++;
-              cardsInRank = groupedCards[Object.keys(groupedCards)[i]].length;
+              cardsInRank = groupedCards.get(keys[i])?.length ?? 0;
               runMultiplier = runMultiplier * cardsInRank;
-              currentRank = parseInt(Object.keys(groupedCards)[i]) as CardRank;
-              if (groupedCards[currentRank + 1])
+              currentRank = parseInt(String(keys[i])) as CardRank;
+              if (groupedCards.get(currentRank + 1))
               {
                 i++;
-                cardsInRank = groupedCards[Object.keys(groupedCards)[i]].length;
+                cardsInRank = groupedCards.get(keys[i])?.length ?? 0;
                 runMultiplier = runMultiplier * cardsInRank;
-                currentRank = parseInt(Object.keys(groupedCards)[i]) as CardRank;
-                if (groupedCards[currentRank + 1])
+                currentRank = parseInt(String(keys[i])) as CardRank;
+                if (groupedCards.get(currentRank + 1))
                 {
                   i++;
-                  cardsInRank = groupedCards[Object.keys(groupedCards)[i]].length;
+                  cardsInRank = groupedCards.get(keys[i])?.length ?? 0;
                   runMultiplier = runMultiplier * cardsInRank;
-                  currentRank = parseInt(Object.keys(groupedCards)[i]) as CardRank;
-                  if (groupedCards[currentRank + 1])
+                  currentRank = parseInt(String(keys[i])) as CardRank;
+                  if (groupedCards.get(currentRank + 1))
                   {
                     i++;
-                    cardsInRank = groupedCards[Object.keys(groupedCards)[i]].length;
+                    cardsInRank = groupedCards.get(keys[i])?.length ?? 0;
                     runMultiplier = runMultiplier * cardsInRank;
                     runningTotal.runs += runMultiplier * 8;
                     // i got tired of copying and pasting, only going up to runs of 8
@@ -150,13 +154,15 @@ export const StartPage = () => {
   const sumMiscPoints = (sortedCards: Card[], runningTotal: { pairs: number, flushes: number, nobs: number }) => {
     // calculate the pairs
     const groupedCards = sortedCards.reduce(function(group, card) {
-      (group[card.rank] = group[card.rank] || []).push(card);
+      const cardsOfRank = group.get(card.rank) || [];
+      cardsOfRank.push(card);
+      group.set(card.rank, cardsOfRank);
       return group;
-    }, {} as Map<CardRank, Card[]>);
+    }, new Map<CardRank, Card[]>());
 
-    Object.keys(groupedCards).forEach((rank) => {
-      if (groupedCards[rank].length > 1){
-        runningTotal.pairs += (groupedCards[rank].length * (groupedCards[rank].length - 1));
+    groupedCards.forEach((cards) => {
+      if (cards.length > 1){
+        runningTotal.pairs += (cards.length * (cards.length - 1));
       }
     })
 
@@ -211,13 +217,13 @@ export const StartPage = () => {
     {
       cardsBySuit.set(card.suit, []);
     }
-    cardsBySuit.set(card.suit, [...cardsBySuit.get(card.suit), card]);
+    cardsBySuit.set(card.suit, [...(cardsBySuit.get(card.suit) || []), card]);
   });
 
   return (
     <div>
       <div className="margin-bottom-md">
-         First select where you are adding your cards too (hand or cut cards), and then click on a card to add it that location.
+         First select where you are adding your cards to (hand or cut cards), and then click on a card to add it that location.
       </div>
       <Row gutter={24}>
         <Col xs={16} sm={14} md={12} lg={10} xl={8}>
@@ -305,4 +311,4 @@ export const StartPage = () => {
   );
 }
 
-export default StartPage;
+export default HandCounter;
