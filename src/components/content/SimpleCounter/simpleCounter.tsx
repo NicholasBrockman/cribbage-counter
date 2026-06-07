@@ -12,7 +12,7 @@ import '../HandCounter/handCounter.css';
 
 export const SimpleCounter = () => {
   const baseContext = useContext(BaseContext);
-  useEffect(() => baseContext.setTitle('Calculate Hand Score'));
+  useEffect(() => baseContext.setTitle('Simple Hand Score'));
   const [selectedCards, setSelectedCards] = useState<Card[] | null>([]);
   const [handScore, setHandScore] = useState<{ fifteens: number, runs: number, pairs: number, flushes: number, nobs: number, totalScore: number } | null>(null);
 
@@ -131,13 +131,13 @@ export const SimpleCounter = () => {
          Select all the cards you want to count. This simple counter does not count flushes or nobs.
       </div>
       <Row gutter={24}>
-        <Col xs={16} sm={14} md={12} lg={10} xl={8}>
+        <Col xs={12} lg={10} xl={8}>
           <Row className="margin-bottom-md">
             <Col className='margin-left-md'>
               <Button onClick={handleClearSelection}>Clear all</Button>
             </Col>
           </Row>
-          <Row>
+          <Row className="margin-bottom-md">
             {[...cardsBySuit.entries()].map(([suit, cards]) => (
               <>
                 {cards.map((card) => (  
@@ -148,13 +148,13 @@ export const SimpleCounter = () => {
               </>
             ))}
           </Row>
-        </Col>
-        <Col xs={8} sm={10} md={12} lg={14} xl={16}>
-          <div className="margin-bottom-md">
+          <Row>
             <Button type="primary" onClick={handleCalculateScore}>Calculate score</Button>
-          </div>
+          </Row>
+        </Col>
+        <Col xs={12} lg={14} xl={16} style={{ paddingTop: '15px'}}>
           <Row className="margin-bottom-md">
-            <Col xs={8}>
+            <Col xs={12}>
               Selected Cards
             </Col>
           </Row>

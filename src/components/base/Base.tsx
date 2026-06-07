@@ -1,9 +1,8 @@
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import {
   Layout
 } from 'antd';
 
-import Header from '../header/Header';
 import {SideBar} from '../sidebar/Sidebar';
 import './base.css';
 import { Loading } from '../common/Loading';
@@ -37,25 +36,19 @@ export const Base = ({
     }
   }, [ searchParams, navigate ]);
 
-  const [navBarCollapsed, setNavBarCollapsed] = useState(false);
   return (
     <BaseContext.Provider value={{setTitle: setBaseTitle, title: baseTitle}}>
-      <Layout hasSider>
-        <Layout.Sider theme='light' collapsed={navBarCollapsed} onCollapse={setNavBarCollapsed} onBreakpoint={setNavBarCollapsed} breakpoint='md'>
-          <SideBar />
-        </Layout.Sider>
         <Layout>
-          <Layout.Header>
-            <Header />
+          <Layout.Header style={{display: 'flex', alignItems: 'center' }}>
+            <SideBar />
           </Layout.Header>
-          <Layout.Content>
+          <Layout.Content style={{ padding: '8px 8px'}}>
               <Title level={2}>{baseTitle}</Title>
               <Suspense fallback={<Loading />}>
                 <Outlet />
               </Suspense>
           </Layout.Content>
         </Layout>
-      </Layout>
     </BaseContext.Provider>
   );
 }

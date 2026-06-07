@@ -4,7 +4,7 @@ import { routeUrls } from "../../routes";
 
 import './sidebar.css'
 import { ItemType, MenuItemType } from "antd/es/menu/interface";
-import { AimOutlined, HomeOutlined } from "@ant-design/icons";
+import { AimOutlined, CalculatorOutlined, HomeOutlined } from "@ant-design/icons";
 
 
 export const SideBar = () => {
@@ -21,7 +21,7 @@ export const SideBar = () => {
       key: routeUrls.hand,
       label: "Count Hand",
       onClick: () => navigate(routeUrls.hand),
-      icon: <HomeOutlined />,
+      icon: <CalculatorOutlined />,
     },
     {
       key: routeUrls.bestJoker,
@@ -32,19 +32,19 @@ export const SideBar = () => {
   ]
 
   return (
-    <div className="sidebar">
-      <div className="padding-md text-center selectness border-normal">
+    <>
+      <div >
         <h1 className="sidebar-title">Cribbage Helper</h1>
       </div>
 
       <Menu
         theme="light"
         selectedKeys={[`${location.pathname}`]}
-        mode="inline"
-        className="padding-top-lg"
+        mode="horizontal"
         items={items}
-      />;
-    </div>
+        style={{ flex: 1, minWidth: 0 }}
+      />
+    </>
   );
 }
 
