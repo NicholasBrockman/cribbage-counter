@@ -1,17 +1,18 @@
-.sidebar {
-  background: #ffffff;
-}
-
 .sidebar-title {
-  margin-right: -10px;
-  border-right: 1px solid #E9E9E9;
+  white-space: nowrap;
+  margin: 0 16px 0 0;
+  font-size: 18px;
 }
-
-.ant-menu-item a {
-  color: #666666;
-  display: inherit;
-}
-
-.ant-menu-item-selected a {
-  color: #2db7f5;
+ 
+/* Hide menu labels on small screens, show icons only */
+@media (max-width: 480px) {
+  .sidebar-title {
+    font-size: 14px;
+    margin-right: 8px;
+  }
+ 
+  .ant-menu-title-content {
+    display: none !important;
+  }
+ 
 }
