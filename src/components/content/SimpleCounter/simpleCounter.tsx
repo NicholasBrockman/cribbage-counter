@@ -2,48 +2,33 @@ import { useContext, useEffect, useState } from 'react';
 import {
   Button,
   Col,
-  Radio,
-  RadioChangeEvent,
   Row
 } from 'antd';
 import classNames from 'classnames';
 import { BaseContext } from '../../base/Base';
-import './simpleCounter.css';
-import { Card, CardRank, CardSuit, FullDeckCards } from '../../../types/card';
+import { Card, CardSuit, FullDeckCards } from '../../../types/card';
 import { sum } from 'lodash';
+import '../HandCounter/handCounter.css';
 
-export const StartPage = () => {
+export const SimpleCounter = () => {
   const baseContext = useContext(BaseContext);
-  useEffect(() => baseContext.setTitle('Count Hand'));
-  const [isAddingToHand, setIsAddingToHand] = useState(true);
-  const [handCards, setHandCards] = useState<Card[]>([]);
-  const [cutCards, setCutCards] = useState<Card[]>([]);
+  useEffect(() => baseContext.setTitle('Calculate Hand Score'));
+  const [selectedCards, setSelectedCards] = useState<Card[] | null>([]);
   const [handScore, setHandScore] = useState<{ fifteens: number, runs: number, pairs: number, flushes: number, nobs: number, totalScore: number } | null>(null);
 
-  const handleCardLocationChange = (e: RadioChangeEvent) => {
-    setIsAddingToHand(e.target.value);
-  }
-
-  const handleCardClick = (selectedCard: Card) => {
-    if (isAddingToHand)
+  const handleCardClick = (selectedCard: Card, isAddingCard: boolean, selectedIndex?: number) => {
+    if (isAddingCard)
     {
-      setHandCards([...handCards, selectedCard]);
-    }
-    else 
+      setSelectedCards([...selectedCards, selectedCard]);
+    } 
+    else
     {
-      setCutCards([...cutCards, selectedCard])
+      setSelectedCards([...selectedCards.slice(0, selectedIndex), ...selectedCards.slice(selectedIndex + 1)]);
     }
   }
 
   const handleClearSelection = () => {
-    if (isAddingToHand)
-    {
-      setHandCards([]);
-    }
-    else 
-    {
-      setCutCards([])
-    }
+      setSelectedCards([]);
   }
 
   const sumFifteen = (cardValues: number[], subSetValues: number[], runningTotal: { fifteens: number }) => {
@@ -66,141 +51,56 @@ export const StartPage = () => {
   }
 
   const sumRuns = (remainingCards: Card[], runningTotal: { runs: number }) => {
-
-    const groupedCards: Map<CardRank, Card[]> = remainingCards.reduce(function(group, card) {
-      if (!group.has(card.rank)) {
-        group.set(card.rank, []);
-      }
-      group.get(card.rank)!.push(card);
+    const groupedCards: Record<number, Card[]> = remainingCards.reduce(function(group, card) {
+      (group[card.rank] = group[card.rank] || []).push(card);
       return group;
-    }, new Map<CardRank, Card[]>());
+    }, {} as Record<number, Card[]>);
 
-    const numberOfRanks = groupedCards.size;
-    // this is ugliest code I've ever written, but i gave up on recursion
-    for (let i = 0; i < numberOfRanks; i++)
-    {
-      const keys = Array.from(groupedCards.keys());
-      let runMultiplier = groupedCards.get(keys[i])?.length || 0;
-      let currentRank = parseInt(String(keys[i])) as CardRank;
-      if (groupedCards.get(currentRank + 1))
-      {
-        i++;
-        let cardsInRank = groupedCards.get(keys[i])?.length ?? 0;
-        runMultiplier = runMultiplier * cardsInRank;
-        currentRank = parseInt(String(keys[i])) as CardRank;
-        if (groupedCards.get(currentRank + 1))
-        {
-          // at this point, we are three ranks deep so the run will score points
-          i++;
-          cardsInRank = groupedCards.get(keys[i])?.length ?? 0;
-          runMultiplier = runMultiplier * cardsInRank;
-          currentRank = parseInt(String(keys[i])) as CardRank;
-          if (groupedCards.get(currentRank + 1))
-          {
-            i++;
-            cardsInRank = groupedCards.get(keys[i])?.length ?? 0;
-            runMultiplier = runMultiplier * cardsInRank;
-            currentRank = parseInt(String(keys[i])) as CardRank;
-            if (groupedCards.get(currentRank + 1))
-            {
-              i++;
-              cardsInRank = groupedCards.get(keys[i])?.length ?? 0;
-              runMultiplier = runMultiplier * cardsInRank;
-              currentRank = parseInt(String(keys[i])) as CardRank;
-              if (groupedCards.get(currentRank + 1))
-              {
-                i++;
-                cardsInRank = groupedCards.get(keys[i])?.length ?? 0;
-                runMultiplier = runMultiplier * cardsInRank;
-                currentRank = parseInt(String(keys[i])) as CardRank;
-                if (groupedCards.get(currentRank + 1))
-                {
-                  i++;
-                  cardsInRank = groupedCards.get(keys[i])?.length ?? 0;
-                  runMultiplier = runMultiplier * cardsInRank;
-                  currentRank = parseInt(String(keys[i])) as CardRank;
-                  if (groupedCards.get(currentRank + 1))
-                  {
-                    i++;
-                    cardsInRank = groupedCards.get(keys[i])?.length ?? 0;
-                    runMultiplier = runMultiplier * cardsInRank;
-                    runningTotal.runs += runMultiplier * 8;
-                    // i got tired of copying and pasting, only going up to runs of 8
-                  } 
-                  else {
-                    runningTotal.runs += runMultiplier * 7;
-                  }
-                } 
-                else {
-                  runningTotal.runs += runMultiplier * 6;
-                }
-              } 
-              else {
-                runningTotal.runs += runMultiplier * 5;
-              }
-            } 
-            else {
-              runningTotal.runs += runMultiplier * 4;
-            }
-          }
-          else {
-            runningTotal.runs += runMultiplier * 3;
-          }
-        }
+    const sortedRanks = Object.keys(groupedCards).map(Number).sort((a, b) => a - b);
+
+    let i = 0;
+    while (i < sortedRanks.length) {
+      // Walk forward as long as ranks are consecutive
+      let j = i;
+      let runMultiplier = 1;
+      while (j + 1 < sortedRanks.length && sortedRanks[j + 1] === sortedRanks[j] + 1) {
+        runMultiplier *= groupedCards[sortedRanks[j]].length;
+        j++;
       }
+
+      const runLength = j - i + 1;
+      if (runLength >= 3) {
+        runMultiplier *= groupedCards[sortedRanks[j]].length;
+        runningTotal.runs += runMultiplier * runLength;
+      }
+
+      i = j + 1;
     }
   }
 
-  const sumMiscPoints = (sortedCards: Card[], runningTotal: { pairs: number, flushes: number, nobs: number }) => {
+  const sumMiscPoints = (sortedCards: Card[], runningTotal: { pairs: number }) => {
     // calculate the pairs
     const groupedCards = sortedCards.reduce(function(group, card) {
-      const cardsOfRank = group.get(card.rank) || [];
-      cardsOfRank.push(card);
-      group.set(card.rank, cardsOfRank);
+      (group[card.rank] = group[card.rank] || []).push(card);
       return group;
-    }, new Map<CardRank, Card[]>());
+    }, {} as Record<number, Card[]>);
 
-    groupedCards.forEach((cards, rank) => {
-      if (cards.length > 1){
-        runningTotal.pairs += (cards.length * (cards.length - 1));
+    Object.keys(groupedCards).forEach((rank) => {
+      if (groupedCards[rank].length > 1){
+        runningTotal.pairs += (groupedCards[rank].length * (groupedCards[rank].length - 1));
       }
-    })
-
-    // calculate the flushes
-    if (handCards.every((card) => card.suit === handCards[0].suit))
-    {
-      // add value of flush from hand
-      runningTotal.flushes += handCards.length;
-
-      // check if cut cards are also part of flush
-      cutCards.forEach((cutCard) => {
-        if (cutCard.suit === handCards[0].suit)
-        {
-          runningTotal.flushes += 1;
-        }
-      })
-    }
-
-    // calculated nobs
-    const jacksInHand = handCards.filter((card) => card.rank === CardRank.Jack);
-    cutCards.forEach((cutCard) => {
-      jacksInHand.forEach((handJack) => {
-        if (handJack.suit === cutCard.suit){
-          runningTotal.nobs += 1;
-        }
-      })
     })
   }
 
   const handleCalculateScore = () => {
-    if (handCards.length === 0 || cutCards.length === 0)
+    if (selectedCards.length === 0)
     {
-      alert("Please select at least one card for both hand and cut.")
+      alert("Please select at least one card.")
       return;
     }
 
     // sort cards from lowest to highest
-    const sortedCards = [...handCards, ...cutCards].sort((a, b) => a.value - b.value);
+    const sortedCards = [...selectedCards].sort((a, b) => a.value - b.value);
 
     // passing in object instead of number to update by reference
     let runningTotal = { fifteens: 0, runs: 0, pairs: 0, flushes: 0, nobs: 0, totalScore: 0 };
@@ -213,48 +113,39 @@ export const StartPage = () => {
 
   const cardsBySuit = new Map<CardSuit, Card[]>();
   FullDeckCards.forEach((card) => {
+    if (card.suit !== CardSuit.Spades)
+    {
+      // only show a single suit for the simple counter since suit doesn't matter for scoring
+      return;
+    }
     if (!cardsBySuit.has(card.suit))
     {
       cardsBySuit.set(card.suit, []);
     }
-    cardsBySuit.set(card.suit, [...(cardsBySuit.get(card.suit) || []), card]);
+    cardsBySuit.set(card.suit, [...cardsBySuit.get(card.suit), card]);
   });
 
   return (
     <div>
       <div className="margin-bottom-md">
-         First select where you are adding your cards to (hand or cut cards), and then click on a card to add it that location.
+         Select all the cards you want to count. This simple counter does not count flushes or nobs.
       </div>
       <Row gutter={24}>
         <Col xs={16} sm={14} md={12} lg={10} xl={8}>
           <Row className="margin-bottom-md">
-            <Col>
-              <Radio.Group 
-                onChange={handleCardLocationChange} 
-                value={isAddingToHand} 
-                optionType="button"
-                buttonStyle="solid"
-              >
-                <Radio value={true}>Hand</Radio>
-                <Radio value={false}>Cut</Radio>
-              </Radio.Group>
-            </Col>
             <Col className='margin-left-md'>
-              <Button onClick={handleClearSelection}>Reset</Button>
+              <Button onClick={handleClearSelection}>Clear all</Button>
             </Col>
-          </Row>
-          <Row className="margin-bottom-md">
-            Click on a card to add to {isAddingToHand ? "your hand." : "the cut."}
           </Row>
           <Row>
             {[...cardsBySuit.entries()].map(([suit, cards]) => (
-              <Col>
-                {cards.map((card) => (
-                  <Row onClick={() => handleCardClick(card)} className={classNames("cardDisplay", "fullDeck", {"cardRed": [CardSuit.Diamonds, CardSuit.Hearts].includes(suit)})}>
+              <>
+                {cards.map((card) => (  
+                  <span onClick={() => handleCardClick(card, true)} className={classNames("cardDisplay", "fullDeck", {"cardRed": [CardSuit.Diamonds, CardSuit.Hearts].includes(suit)})}>
                     {card.displayName}
-                  </Row>
+                  </span>
                 ))}
-              </Col>
+              </>
             ))}
           </Row>
         </Col>
@@ -264,23 +155,17 @@ export const StartPage = () => {
           </div>
           <Row className="margin-bottom-md">
             <Col xs={8}>
-              Hand Cards
+              Selected Cards
             </Col>
           </Row>
           <Row className="margin-bottom-md">
-            {handCards.map((handCard) => (
-              <span className={classNames("cardDisplay", {"cardRed": [CardSuit.Diamonds, CardSuit.Hearts].includes(handCard.suit)})}>{handCard.displayName}</span>
-            ))}
-          </Row>
-          <Row className="margin-bottom-md margin-top-md">
-            <Col xs={8}>
-              Cut Cards
-            </Col>
-          </Row>
-          <Row>
-            {cutCards.map((cutCard) => (
-              <span className={classNames("cardDisplay", {"cardRed": [CardSuit.Diamonds, CardSuit.Hearts].includes(cutCard.suit)})}>{cutCard.displayName}</span>
-            ))}
+            {[...selectedCards]
+              .map((handCard, idx) => ({ handCard, idx }))
+              .sort((a, b) => a.handCard.rank - b.handCard.rank)
+              .map(({ handCard, idx }) => (
+                <span onClick={() => handleCardClick(handCard, false, idx)} className={classNames("cardDisplay", {"cardRed": [CardSuit.Diamonds, CardSuit.Hearts].includes(handCard.suit)})}>{handCard.displayName}</span>
+              ))
+            }
           </Row>
           {handScore !== null && (
             <>
@@ -294,13 +179,7 @@ export const StartPage = () => {
                   Pairs:&ensp;<strong>{handScore.pairs}</strong>
               </Row>
               <Row>
-                  Flushes:&ensp;<strong>{handScore.flushes}</strong>
-              </Row>
-              <Row>
-                  Nobs:&ensp;<strong>{handScore.nobs}</strong>
-              </Row>
-              <Row>
-                  Your total hand score is:&ensp;<strong>{handScore.totalScore}</strong>
+                  Total hand score:&ensp;<strong>{handScore.totalScore}</strong>
               </Row>
             </>
           )}
@@ -311,4 +190,4 @@ export const StartPage = () => {
   );
 }
 
-export default StartPage;
+export default SimpleCounter;

@@ -12,7 +12,7 @@ import './handCounter.css';
 import { Card, CardRank, CardSuit, FullDeckCards } from '../../../types/card';
 import { sum } from 'lodash';
 
-export const StartPage = () => {
+export const HandCounter = () => {
   const baseContext = useContext(BaseContext);
   useEffect(() => baseContext.setTitle('Calculate Hand Score'));
   const [isAddingToHand, setIsAddingToHand] = useState(true);
@@ -160,7 +160,7 @@ export const StartPage = () => {
       return group;
     }, new Map<CardRank, Card[]>());
 
-    groupedCards.forEach((cards, rank) => {
+    groupedCards.forEach((cards) => {
       if (cards.length > 1){
         runningTotal.pairs += (cards.length * (cards.length - 1));
       }
@@ -311,4 +311,4 @@ export const StartPage = () => {
   );
 }
 
-export default StartPage;
+export default HandCounter;

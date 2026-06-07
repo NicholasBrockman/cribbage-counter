@@ -1,23 +1,23 @@
 import * as React from 'react';
 import { Route, Routes } from 'react-router';
 const Base = React.lazy(() => import('./components/base/Base'));
-const SimpleCount = React.lazy(() => import('./components/content/HandCounter/handCounter'));
-const AdvancedCount = React.lazy(() => import('./components/content/HandCounter/handCounter'));
+const SimpleCounter = React.lazy(() => import('./components/content/SimpleCounter/simpleCounter'));
+const HandCounter = React.lazy(() => import('./components/content/HandCounter/handCounter'));
 const BestJokerPage = React.lazy(() => import('./components/content/BestJoker/bestJoker'));
 const NotFound = React.lazy(() => import('./components/content/NotFound/NotFound'));
 
 export const routeUrls = {
-  simpleCount: "/",
-  advCount: "/advCount",
-  bestJoker: "/bestJoker",
+  home: "/",
+  hand: "/hand",
+  bestJoker: "/best-joker",
 }
 
 export default () => {
   return (
     <Routes>
       <Route element={<Base />}>
-        <Route index Component={SimpleCount} />
-        <Route path={routeUrls.advCount} Component={AdvancedCount} />
+        <Route index Component={SimpleCounter} />
+        <Route path={routeUrls.hand} Component={HandCounter} />
         <Route path={routeUrls.bestJoker} Component={BestJokerPage} />
         <Route path="*" Component={NotFound} />
       </Route>

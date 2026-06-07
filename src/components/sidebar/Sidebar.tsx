@@ -12,15 +12,15 @@ export const SideBar = () => {
   const navigate = useNavigate();
   const items: ItemType<MenuItemType>[] = [
     {
-      key: routeUrls.simpleCount,
+      key: routeUrls.home,
       label: "Simple Count",
-      onClick: () => navigate(routeUrls.simpleCount),
+      onClick: () => navigate(routeUrls.home),
       icon: <HomeOutlined />,
     },
     {
-      key: routeUrls.advCount,
+      key: routeUrls.hand,
       label: "Count Hand",
-      onClick: () => navigate(routeUrls.advCount),
+      onClick: () => navigate(routeUrls.hand),
       icon: <HomeOutlined />,
     },
     {
